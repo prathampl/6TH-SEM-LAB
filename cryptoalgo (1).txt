@@ -1,0 +1,285 @@
+ ########
+###caesar cipher
+pt = input("Enter the plain Text").lower()
+pt = [ord(a)-97 for a in pt]
+key = int(input("Enter the key"))
+print("Encrypted text is")
+cip = []
+for i in pt:
+    cip.append((i+key)%26)
+    print(chr((i+key)%26+97),end="")
+print()
+print("Decrypted text is")
+for i in cip:
+    print(chr((i-key)%26+97),end="")
+
+
+
+
+#########
+
+#########
+##play fair cipher
+
+def find(a,b):
+    temp = 0
+    r1,c1,r2,c2 =0,0,0,0
+    for i in range(25):
+        if temp!=2:
+            if a==keym[i//5][i%5]:
+                r1,c1 = i//5,i%5
+                temp+=1
+            if b==keym[i//5][i%5]:
+                r2,c2 = i//5,i%5
+                temp+=1
+        else:
+            break
+    #checking the 3 conditions
+    #1st is checking the same row if same then we need to just increase the row count
+    if(c1==c2):
+        print("{}{}".format(keym[(r1+1)%5][c1],keym[(r2+1)%5][c2]),end="")
+    elif(r1==r2):
+        print("{}{}".format(keym[r1][(c1+1)%5],keym[r2][(c2+1)%5]),end="")
+    else:
+        print("{}{}".format(keym[r1][c2],keym[r2][c1]),end="")
+
+
+#user inputs
+pt = input("Enter the plainText: ").replace(' ','')
+key = input("Enter the key: ").replace(' ','')
+# pt = "nittemeenakshiinstuteoftechnology"
+# key = "monarrchy"
+#convert given string to lower case
+pt = pt.lower()
+key = key.lower()
+pt.replace('j','i')
+key.replace('j','i')
+pt = [a for a in pt]
+for i in range(0,len(pt),2):
+    if pt[i]==pt[i+1]:
+        pt.insert(i+1,'x')
+while(len(pt)%2!=0):
+    pt.append('z')
+#convert to numbers
+key1,key2 = set(),list()
+for a in key:
+    if a not in key1:
+        key1.add(a)
+        key2.append(a)
+
+#make key only unique values
+#creating the key matrix
+global keym 
+keym = [['0' for i in range(5)] for j in range(5)]
+alpha = [chr(i+97) for i in range(26)]
+#removing j since i and j are similiar
+alpha.remove('j')
+
+count,j =0,0
+for i in range(25):
+    if(count<len(key2)):
+        alpha.remove(key2[count])
+        keym[i//5][i%5] = key2[count]
+        count+=1
+    else:
+        keym[i//5][i%5] = alpha[j]
+        j+=1
+
+for i in range(0,len(pt),2):
+    find(pt[i],pt[i+1])
+
+
+
+
+
+
+
+
+##########
+Hill cipher
+import numpy as np
+pt = input("Enter the plain text ").lower()
+key = input("Enter the key ").lower()
+pt = np.array([(ord(a)-97) for a in pt])
+key = np.array([(ord(b)-97) for b in key]) #converting alphabets to ascii values
+
+#converting the given text to lowercase
+
+if(len(key)==4):
+    size = 2
+    keym = key.reshape(2,2)
+if(len(key)==9):
+    size = 3
+    keym = key.reshape(3,3)
+    
+# loop to append extra characters
+while(len(pt)%size!=0):
+    pt = np.append(pt,23)
+
+#splits the array into equal parts
+ptm = np.array_split(pt,len(pt)/size)
+print("Encrypted text is")
+enc = []
+for a in ptm:
+    a = a.reshape(size,1)
+    encr = np.dot(keym,a)%26
+    for a in np.nditer(encr):
+        enc.append(a)
+        print(chr(a+97),end=" ")
+print()    
+print("decrypted text is")
+adj = np.linalg.inv(keym)
+det = round(np.linalg.det(keym))
+adj = adj*det  # inverse*det = adjacent matrix
+
+#np.where() to add all the negative numbers 
+np.where(adj<0,adj+26,adj)
+
+# loop to find the inverse which is used to multiply with matrix
+# use extended euclidean algorithm instead of this.
+x = 1
+while((det*x)%26!=1):
+    x+=1
+
+final = (x*adj)%26 #final is the inverse matrix of the key
+enc = np.array(enc) #enc is the ciphertext
+encm = np.array_split(enc,len(enc)/size) #spliting it into equal sizes
+for a in encm:
+    a = a.reshape(size,1)
+    decr = np.round_(np.dot(final,a))
+    decr = decr.astype(int)
+    decr = decr%26
+    for a in np.nditer(decr):
+        print(chr(a+97),end=" ")
+############
+
+
+
+################
+#vigner cipher
+pt = input()
+key = input()
+pt = pt.lower()
+key = key.lower()
+pt = [ord(a)-97 for a in pt]
+key = [ord(a)-97 for a in key]
+
+i=0
+while(len(key)!=len(pt)):
+    key.append(key[i])
+    i+=1
+    if(i==len(key)):
+        i=0
+
+for i,j in zip(pt,key):
+    res = (i+j)%26
+    print(chr(res+97),end="")
+
+#############
+
+
+
+
+#######
+railfence cipher
+pt = input("Enter the plain text: ")
+key = int(input("Enter the key: "))
+res = [['0' for j in range(0,len(pt))]for j in range(0,key)]
+r,c=0,0
+temp = 1
+for i in pt:
+    res[r][c]=i
+    c+=1
+    if temp==1:
+        r+=1
+        if r>=key-1:
+            temp=0
+    else:
+        r-=1
+        if r<=0:
+            temp = 1
+
+for i in range(0,key):
+    for j in range(0,len(pt)):
+        if res[i][j]!='0':
+            print(res[i][j],end="")
+
+#########
+Diffie Helman
+
+def gcd(a,b):
+  if b==0:
+    return a
+  else:
+    return gcd(b,a%b)
+
+def primitive_root(modulo):
+  roots=[]
+
+  required_set=set(num for num in range(1,modulo) if gcd(num,modulo)==1)
+
+
+  for g in range(1,modulo):
+    actual_set=set(pow(g,powers)%modulo for powers in range(1,modulo))
+    
+    if actual_set==required_set:
+      roots.append(g)
+     
+
+  return roots
+
+p=int(input("Enter prime number:"))
+print("These are the primitive roots of your chosen prime number:")
+print(primitive_root(p))
+g=int(input("Choose any one:"))
+
+a=int(input("Enter Private key of Alice:"))
+b=int(input("Enter Private key of Bob:"))
+
+x =int(pow(g,a)%p)
+y =int(pow(g,b)%p)
+
+print(f"Public key of Alice:{x}")
+print(f"Public key of Bob:{y}")
+
+ka=int(pow(y,a)%p)
+kb=int(pow(x,b)%p)
+
+print(f"Shared key of Alice:{ka}")
+print(f"Shared key of Bob:{kb}")
+
+##################################
+RSA
+def gcd(p,q):
+    while(q!=0):
+        p,q=q,p%q
+    if p==1:
+        return True
+    else:
+        return False
+
+pt = int(input("Enter the plan text"))
+p = int(input("Enter the first prime number"))
+q = int(input("Enter the second prime number"))
+n = p*q
+pi = (p-1)*(q-1)
+res=[]
+for i in range(2,pi):
+    if gcd(i,pi):
+        res.append(i)
+print(res)
+e = int(input("Enter your public key e"))
+x=1
+while((e*x)%pi!=1):
+    x+=1
+# if gcd1(e,pi)!=1:
+#     print("Inverse doesnt exist")
+#     exit(0)
+# if x<0:
+#     x+=pi
+print("corresponding d(private key) is ",x)
+cip = (pt**e)%n
+print("The cipher text is",cip)
+dec = (cip**x)%n
+print("The decrypted text is ",dec)
+##################################################
